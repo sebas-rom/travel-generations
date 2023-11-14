@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from deap import algorithms, base, creator, tools
 from geopy.distance import geodesic
 import time
+
 # Constants
 POPULATION_SIZE = 300
 P_CROSSOVER = 0.9

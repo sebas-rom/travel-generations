@@ -8,7 +8,7 @@ import time
 POPULATION_SIZE = 300
 P_CROSSOVER = 0.9
 P_MUTATION = 0.1
-MAX_GENERATIONS = 200
+MAX_GENERATIONS = 10
 HALL_OF_FAME_SIZE = 5
 RANDOM_SEED = 42
 
@@ -142,7 +142,6 @@ def TSP(elitism=False, random_seed=False):
     hall_of_fame_size = 30 if elitism else 5
     hof = tools.HallOfFame(hall_of_fame_size)
     
-    
     toolbox = create_toolbox()
     
     
@@ -154,8 +153,6 @@ def TSP(elitism=False, random_seed=False):
     # Determinate if the algorithm will use elitism or not based on the hall of fame size
     elitism = "with" if hall_of_fame_size == 30 else "without"
     print(f"Running genetic algorithm {elitism} elitism...\n ")
-    print(hall_of_fame_size)
-    
     pop = toolbox.population(n=POPULATION_SIZE)
     pop, log,best_individuals = eaSimple(pop, toolbox, cxpb=P_CROSSOVER, mutpb=P_MUTATION, ngen=MAX_GENERATIONS,
                                        stats=stats, hof=hof, verbose=True)
@@ -180,40 +177,38 @@ def TSP(elitism=False, random_seed=False):
     route = " ==> ".join([cities[i][0] for i in best_individual_of_all])
     print(f"Route: {route}\nDistance: {total_distance}")
     
-    filename_for_best_route_original_population = f"Best original route {elitism} elitism"
-    if random_seed:
-        filename_for_best_route_original_population += " with random seed"
-    else:
-        filename_for_best_route_original_population += " with seed 42"
-    filename_for_best_route_original_population += ".png"
-    
-    
-    filename_for_best_route = f"Best route {elitism} elitism"
-    if random_seed:
-        filename_for_best_route += " with random seed"
-    else:
-        filename_for_best_route += " with seed 42"
-    filename_for_best_route += ".png"
-    
-    
-    filename_for_statistics = f"Min and Average Fitness {elitism} elitism"
-    if random_seed:
-        filename_for_statistics += " with random seed"
-    else:
-        filename_for_statistics += " with seed 42"
-    filename_for_statistics += ".png"
+
     
     
     print("\nPath obtained using the best individual from the original population")
-    plot_route(cities=cities,best=best_individual_original, filename=filename_for_best_route_original_population)
+    plot_route(cities=cities,best=best_individual_original, filename=generate_file_name(plot="route_original",elitism=elitism, random_seed=random_seed))
     print("=====================================================================================================")
-    print("\n Path obtained using the best individual from all generations including the original population")
-    plot_route(cities=cities,best=best_individual_of_all, filename=filename_for_best_route)
+    print("\nPath obtained using the best individual from all generations including the original population")
+    plot_route(cities=cities,best=best_individual_of_all, filename=generate_file_name(plot="route",elitism=elitism, random_seed=random_seed))
     print("=====================================================================================================")
-    print("Plot of the min and average fitness over generations")
-    plot_Min_Avg_fitness(min_fitness_values=min_fitness_values, mean_fitness_values=mean_fitness_values,filename=filename_for_statistics)
+    print("\nPlot of the min and average fitness over generations")
+    plot_Min_Avg_fitness(min_fitness_values=min_fitness_values, mean_fitness_values=mean_fitness_values,filename=generate_file_name(plot="statistics",elitism=elitism, random_seed=random_seed))
     print("=====================================================================================================")
     
+def generate_file_name(plot,elitism, random_seed):
+    filename=""
+    if plot=="route":
+        filename="Best route"
+    elif plot=="route_original":
+        filename="Best original route"
+    elif plot=="statistics":
+        filename="Min and Average Fitness"
+    if elitism:
+        filename += " with elitism"
+    else:
+        filename += " without elitism"
+    if random_seed:
+        filename += " with random seed"
+    else:
+        filename += " with seed 42"
+    filename += ".png"
+    return filename
+
 def plot_Min_Avg_fitness(min_fitness_values, mean_fitness_values,filename):
     
     plt.clf()
